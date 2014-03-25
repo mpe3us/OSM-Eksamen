@@ -91,7 +91,8 @@ void thread_table_init(void)
 	thread_table[i].sleeps_on    = 0;
 	thread_table[i].pagetable    = NULL;
 	thread_table[i].process_id   = -1;	
-	thread_table[i].next         = -1;	
+	thread_table[i].next         = -1;
+    thread_table[i].next         = 0;	
     }
 
     thread_table[IDLE_THREAD_TID].context->cpu_regs[MIPS_REGISTER_SP] =
@@ -118,7 +119,7 @@ void thread_table_init(void)
  * @return The thread ID of the created thread, or negative if
  * creation failed (thread table is full).
  */
-TID_t thread_create(void (*func)(uint32_t), uint32_t arg)
+TID_t thread_create(void (*func)(uint32_t), uint32_t arg, uint32_t deadline)
 {
     static TID_t next_tid = 0;
     TID_t i, tid = -1;
@@ -171,6 +172,8 @@ TID_t thread_create(void (*func)(uint32_t), uint32_t arg)
     thread_table[tid].sleeps_on    = 0;
     thread_table[tid].process_id   = -1;
     thread_table[tid].next         = -1;
+
+    thread_table[tid].deadline = deadline;
 
     /* Make sure that we always have a valid back reference on context chain */
     thread_table[tid].context->prev_context = thread_table[tid].context;

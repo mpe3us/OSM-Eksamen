@@ -114,8 +114,27 @@ void scheduler_add_to_ready_list(TID_t t)
 static TID_t scheduler_remove_first_ready(void)
 {
     TID_t t;
+    int i;
 
+    /* As a starting point the earliest deadline is set as the deadline
+       of the head-thread in scheduler_ready_to_run */
+    uint32_t earliest_d = thread_table[scheduler_ready_to_run.head].deadline;
     t = scheduler_ready_to_run.head;
+
+    /* Finds the thread with earliest deadline in the threadtable and
+       sets it as t */
+    for (i=0; i<CONFIG_MAX_THREADS; i++)
+    {
+      /* Makes sure that only threads with a ready-state gets checked */
+      if (thread_table[i].state == THREAD_READY)
+      { 
+        if (thread_table[i].deadline < earliest_d)
+        {
+          t = i;
+          earliest_d = thread_table[i].deadline;
+        }
+      }
+    }
 
     /* Idle thread should never be on the ready list. */
     KERNEL_ASSERT(t != IDLE_THREAD_TID);

@@ -44,6 +44,8 @@
 #include "drivers/gcd.h"
 #include "fs/vfs.h"
 
+#include "drivers/metadev.h"
+
 void syscall_exit(int retval)
 {
     process_finish(retval);
@@ -144,6 +146,12 @@ int syscall_file(char *path, int idx, char *buffer)
     return vfs_file(path, idx, buffer);
 }
 
+// Calls rtc_get_msec() which returns the number of milliseconds since startup
+int syscall_getclock()
+{
+  return rtc_get_msec();
+}
+
 /**
  * Handle system calls. Interrupts are enabled when this function is
  * called.
@@ -215,6 +223,10 @@ void syscall_handle(context_t *user_context)
         case SYSCALL_FILE:
             user_context->cpu_regs[MIPS_REGISTER_V0] =
                 syscall_file((char *)A1, A2, (char *)A3);
+            break;
+        case SYSCALL_GETCLOCK:
+            user_context->cpu_regs[MIPS_REGISTER_V0] =
+                syscall_getclock();
             break;
         default:
             KERNEL_PANIC("Unhandled system call\n");

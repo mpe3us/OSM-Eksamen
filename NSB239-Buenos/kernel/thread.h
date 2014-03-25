@@ -77,7 +77,7 @@ typedef struct {
     TID_t next; 
  
     /* thread deadline */
-    uint32_t deadline;
+    int deadline;
 
     /* pad to 64 bytes */
     uint32_t dummy_alignment_fill[8]; 
@@ -85,7 +85,7 @@ typedef struct {
 
 /* function prototypes */
 void thread_table_init(void);
-TID_t thread_create(void (*func)(uint32_t), uint32_t arg, uint32_t deadline);
+TID_t thread_create(void (*func)(uint32_t), uint32_t arg, int deadline);
 void thread_run(TID_t t);
 
 TID_t thread_get_current_thread(void);

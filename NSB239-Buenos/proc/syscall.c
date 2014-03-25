@@ -86,7 +86,7 @@ int syscall_join(process_id_t pid)
     return process_join(pid);
 }
 
-process_id_t syscall_exec(const char *filename, uint32_t deadline)
+process_id_t syscall_exec(const char *filename, int deadline)
 {
     return process_spawn(filename, deadline);
 }

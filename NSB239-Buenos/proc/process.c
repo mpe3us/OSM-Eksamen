@@ -226,7 +226,7 @@ void process_start(process_id_t pid)
     KERNEL_PANIC("thread_goto_userland failed.");
 }
 
-process_id_t process_spawn(const char *executable, uint32_t deadline)
+process_id_t process_spawn(const char *executable, int deadline)
 {
     TID_t thread;
     process_id_t pid = alloc_process_id();

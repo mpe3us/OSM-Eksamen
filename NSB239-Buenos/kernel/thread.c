@@ -92,7 +92,7 @@ void thread_table_init(void)
 	thread_table[i].pagetable    = NULL;
 	thread_table[i].process_id   = -1;	
 	thread_table[i].next         = -1;
-    thread_table[i].next         = 0;	
+    thread_table[i].deadline     = 0;	
     }
 
     thread_table[IDLE_THREAD_TID].context->cpu_regs[MIPS_REGISTER_SP] =
@@ -119,7 +119,7 @@ void thread_table_init(void)
  * @return The thread ID of the created thread, or negative if
  * creation failed (thread table is full).
  */
-TID_t thread_create(void (*func)(uint32_t), uint32_t arg, uint32_t deadline)
+TID_t thread_create(void (*func)(uint32_t), uint32_t arg, int deadline)
 {
     static TID_t next_tid = 0;
     TID_t i, tid = -1;

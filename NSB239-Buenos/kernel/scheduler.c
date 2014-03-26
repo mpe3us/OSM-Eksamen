@@ -116,34 +116,52 @@ static TID_t scheduler_remove_first_ready(void)
     TID_t t;
 
     t = scheduler_ready_to_run.head;
-    
+
     /* If the thread deadline is negative, the function will run like it
        originally did */
-    if (thread_table[t].deadline >= 0)
-    {
-      int i;
+   // if (thread_table[t].deadline >= 0)
+    //{
+      /* The head has the earliest deadline as a starting point */
+      TID_t i = scheduler_ready_to_run.head;
 
-      /* As a starting point the earliest deadline is set as the deadline
-         of the head-thread in scheduler_ready_to_run */
-      int earliest_d = thread_table[t].deadline;
+      int no_high_p = 1;
+      int j = i;
+
+     /* Makes sure that earliest deadline starting point is not zero (low-priority).
+       If all deadlines are zero, the head is set as the first thread to be run */
+      if (thread_table[i].deadline <= 0)
+      {
+
+        while (thread_table[i].next >= 0)
+        {
+          if(thread_table[thread_table[i].next].deadline > 0)
+          { 
+            j = thread_table[i].next;
+            no_high_p = 0;
+            /* If a deadline higher than zero is found - break out of loop */
+            break;
+          }
+          i = thread_table[i].next;  
+        }
+      }
 
       /* Finds the thread with earliest deadline in the threadtable and
          sets it as t */
-      for (i=0; i<CONFIG_MAX_THREADS; i++)
+      if (no_high_p == 0)
       {
-        /* Makes sure that only threads with a ready-state gets checked 
-           and bypasses threads with no deadline (deadline = 0)*/
-        if (thread_table[i].state == THREAD_READY && thread_table[i].deadline >= 1)
-        { 
-          if (thread_table[i].deadline < earliest_d)
+        while (thread_table[j].next >= 0)
+        {
+          TID_t j_next = thread_table[j].next;
+          if (thread_table[j].deadline > thread_table[j_next].deadline && 
+              thread_table[j_next].deadline >= 1)
           {
-            t = i;
-            earliest_d = thread_table[i].deadline;
+            t = thread_table[j].next;
           }
+          j = thread_table[j].next;   
         }
       }
-    }
- 
+   // }
+  
     /* Idle thread should never be on the ready list. */
     KERNEL_ASSERT(t != IDLE_THREAD_TID);
 

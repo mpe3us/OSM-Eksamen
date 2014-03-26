@@ -4,14 +4,14 @@
 
 #include "tests/lib.h"
 
-static const char prog[] = "[a]hw"; /* The program to start. */
+static const char prog[] = "[hd]hw"; /* The program to start. */
 
 int main(void)
 {
   uint32_t child;
   int ret;
   printf("Starting program %s\n", prog);
-  child = syscall_exec(prog, 0);
+  child = syscall_exec(prog, 1);
   printf("Now joining child %d\n", child);
   ret = (char)syscall_join(child);
   printf("Child joined with status: %d\n", ret);

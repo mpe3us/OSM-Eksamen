@@ -1,10 +1,10 @@
 #include "tests/lib.h"
 
 /* Programs to be executes */
-static const char prog1[] = "[a]schedule_1"; /* Highest priority */
-static const char prog2[] = "[a]schedule_2"; /* Second-highest priority */
-static const char prog3[] = "[a]schedule_3"; /* Third-highest priority */
-static const char prog4[] = "[a]schedule_4"; /* Low priority */
+static const char prog1[] = "[hd]schedule_1"; /* Highest priority */
+static const char prog2[] = "[hd]schedule_2"; /* Second-highest priority */
+static const char prog3[] = "[hd]schedule_3"; /* Third-highest priority */
+static const char prog4[] = "[hd]schedule_4"; /* Low priority */
 
 int main(void)
 {
@@ -30,17 +30,17 @@ int main(void)
   ret2 = (char)syscall_join(child2);
   printf("Child2 joined with status: %d\n", ret2);
 
-  printf("Starting program %s\n", prog2);
-  child3 = syscall_exec(prog2, 3500); /* Second-highest priority */
+  printf("Starting program %s\n", prog4);
+  child3 = syscall_exec(prog4, 0);    /* Low priority */
   printf("Now joining child %d\n", child3);
   ret3 = (char)syscall_join(child3);
-  printf("Child3 joined with status: %d\n", ret3);
+  printf("Child4 joined with status: %d\n", ret3);
 
-  printf("Starting program %s\n", prog4);
-  child4 = syscall_exec(prog4, 0);    /* Low priority */
+  printf("Starting program %s\n", prog2);
+  child4 = syscall_exec(prog2, 3500); /* Second-highest priority */
   printf("Now joining child %d\n", child4);
   ret4 = (char)syscall_join(child4);
-  printf("Child4 joined with status: %d\n", ret4);
+  printf("Child3 joined with status: %d\n", ret4);
   
   syscall_halt();
   return 0;

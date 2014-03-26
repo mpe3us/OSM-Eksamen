@@ -22,7 +22,7 @@ int main(void)
   child1 = syscall_exec(prog3, 1000); /* Third-highest priority */
 
   printf("Starting program %s\n", prog1);
-  child2 = syscall_exec(prog1, 1);  /* Highest priority */
+  child2 = syscall_exec(prog1, 2);  /* Highest priority */
 
   printf("Starting program %s\n", prog4);
   child3 = syscall_exec(prog4, 10000);    /* Low priority */

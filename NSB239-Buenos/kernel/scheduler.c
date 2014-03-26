@@ -117,50 +117,55 @@ static TID_t scheduler_remove_first_ready(void)
 
     t = scheduler_ready_to_run.head;
 
-    /* If the thread deadline is negative, the function will run like it
-       originally did */
-   // if (thread_table[t].deadline >= 0)
-    //{
-      /* The head has the earliest deadline as a starting point */
-      TID_t i = scheduler_ready_to_run.head;
+    /* The head has the earliest deadline as a starting point */
+    TID_t i = scheduler_ready_to_run.head;
 
-      int no_high_p = 1;
-      int j = i;
+    int no_high_p = 1;
+    no_high_p = no_high_p;
+    int j = i;
 
-     /* Makes sure that earliest deadline starting point is not zero (low-priority).
+    /* Makes sure that earliest deadline starting point is not zero (low-priority).
        If all deadlines are zero, the head is set as the first thread to be run */
-      if (thread_table[i].deadline <= 0)
+    if (thread_table[i].deadline == 0)
+    {
+      while (thread_table[i].next >= 0)
       {
-
-        while (thread_table[i].next >= 0)
-        {
-          if(thread_table[thread_table[i].next].deadline > 0)
-          { 
-            j = thread_table[i].next;
-            no_high_p = 0;
-            /* If a deadline higher than zero is found - break out of loop */
-            break;
-          }
-          i = thread_table[i].next;  
+        TID_t i_next = thread_table[i].next;
+        if (thread_table[i_next].deadline > 0)
+        { 
+          j = i_next;
+          t = j;
+          no_high_p = 0;
+          //kprintf("deadline = 0?: %d\n", thread_table[t].deadline);
+          /* If a deadline is higher than zero is found - break out of loop */
+          break;
         }
+        i = i_next; 
+        //kprintf("i value: %d\n", i);
+        //kprintf("tail value: %d\n", scheduler_ready_to_run.tail); 
+      
       }
+    }
 
-      /* Finds the thread with earliest deadline in the threadtable and
-         sets it as t */
-      if (no_high_p == 0)
+    /* Finds the thread with earliest deadline in the threadtable and
+       sets it as t */
+    if (no_high_p == 0)
+    {
+   // kprintf("p: %d\n", no_high_p);
+      while (thread_table[j].next >= 0)
       {
-        while (thread_table[j].next >= 0)
+        TID_t j_next = thread_table[j].next;
+        if (thread_table[t].deadline > thread_table[j_next].deadline && 
+            thread_table[j_next].deadline >= 1)
         {
-          TID_t j_next = thread_table[j].next;
-          if (thread_table[j].deadline > thread_table[j_next].deadline && 
-              thread_table[j_next].deadline >= 1)
-          {
-            t = thread_table[j].next;
-          }
-          j = thread_table[j].next;   
+          t = j_next;
         }
+        j = j_next;   
       }
-   // }
+      //kprintf("earliest d: %d\n", thread_table[t].deadline);
+    }
+
+    //kprintf("tail value: %d\n", scheduler_ready_to_run.tail); 
   
     /* Idle thread should never be on the ready list. */
     KERNEL_ASSERT(t != IDLE_THREAD_TID);

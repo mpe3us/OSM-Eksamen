@@ -31,7 +31,7 @@ int main(void)
   printf("Child2 joined with status: %d\n", ret2);
 
   printf("Starting program %s\n", prog4);
-  child3 = syscall_exec(prog4, 0);    /* Low priority */
+  child3 = syscall_exec(prog4, 10000);    /* Low priority */
   printf("Now joining child %d\n", child3);
   ret3 = (char)syscall_join(child3);
   printf("Child4 joined with status: %d\n", ret3);

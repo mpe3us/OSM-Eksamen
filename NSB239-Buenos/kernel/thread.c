@@ -92,7 +92,7 @@ void thread_table_init(void)
 	thread_table[i].pagetable    = NULL;
 	thread_table[i].process_id   = -1;	
 	thread_table[i].next         = -1;
-    thread_table[i].deadline     = -1;	
+    thread_table[i].deadline     = 0;	
     }
 
     thread_table[IDLE_THREAD_TID].context->cpu_regs[MIPS_REGISTER_SP] =

@@ -42,6 +42,7 @@
 #include "drivers/device.h"
 #include "fs/tfs.h"
 #include "fs/filesystems.h"
+#include "fs/pipe.h"
 
 /** @name Virtual Filesystem
  *
@@ -266,11 +267,13 @@ void vfs_mount_all(void)
                         "skipping\n");
                 continue;
             }
-
             vfs_mount_fs(gbd, NULL);
+
+            /* Initializes the pipe filesystem and mounts it */
+            fs_t * pipesystem = pipe_init();
+            vfs_mount(pipesystem, "pipe");
         }
     }
-
 }
 
 /**

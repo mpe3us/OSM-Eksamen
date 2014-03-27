@@ -12,11 +12,30 @@
 #include "fs/pipe.h"
 #include "lib/libc.h"
 
+typedef int pipe_id_t;
+
+/* State of a pipe */
+typedef enum {
+    PIPE_FREE,
+    PIPE_TAKEN
+} pipe_state_t;
+
+/* Information/data for each pipe */
+typedef struct {
+    /* Name of the pipe */
+    char name[PIPE_MAX_NAMELENGTH];
+    /* State of the pipe */
+    pipe_state_t state;
+    /* Pipe_id */
+    pipe_id_t pipe_id;
+} pipe_table_t;
+
 /* Data structure for use internally in pipefs. We allocate space for this
  * dynamically during initialization */
 typedef struct {
-  semaphore_t *lock;
-  /* Define any data you may need  here. */
+    semaphore_t *lock;
+    /* Define any data you may need  here. */
+    pipe_table_t *pipes;
 } pipefs_t;
 
 
@@ -34,6 +53,17 @@ fs_t *pipe_init(void)
     fs_t *fs;
     pipefs_t *pipefs;
     semaphore_t *sem;
+    int i;
+
+    pipe_table_t fs_pipes[MAX_PIPES];
+    //fs_pipes = fs_pipes;
+    /* Initializing the pipe table */
+    for(i = 0; i <= MAX_PIPES; i++)
+    {
+      fs_pipes[i].name[0] = 0;
+      fs_pipes[i].state = PIPE_FREE;
+      fs_pipes[i].pipe_id = i;
+    }
 
     /* check semaphore availability before memory allocation */
     sem = semaphore_create(1);
@@ -62,6 +92,9 @@ fs_t *pipe_init(void)
     /* save semaphore to the pipefs_t */
     pipefs->lock = sem;
 
+    /* Set the filesystem pipe to use the new the pipe table */
+    pipefs->pipes = fs_pipes;
+
     fs->internal = (void *)pipefs;
 
     /* We always have this name. */
@@ -77,6 +110,8 @@ fs_t *pipe_init(void)
     fs->getfree   = pipe_getfree;
     fs->filecount = pipe_filecount;
     fs->file      = pipe_file;
+
+    kprintf("PIPE IS INITIALIZED!\n");
 
     return fs;
 }

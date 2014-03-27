@@ -10,6 +10,9 @@
 #include "fs/vfs.h"
 #include "lib/libc.h"
 
+#define MAX_PIPES 10
+#define PIPE_MAX_NAMELENGTH 256
+
 fs_t *pipe_init(void);
 
 int pipe_unmount(fs_t *fs);

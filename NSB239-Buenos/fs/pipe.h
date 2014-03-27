@@ -11,7 +11,8 @@
 #include "lib/libc.h"
 
 #define MAX_PIPES 10
-#define PIPE_MAX_NAMELENGTH 256
+#define PIPE_MAX_NAMELENGTH 20
+#define PIPE_MAX_BUFFER 50
 
 fs_t *pipe_init(void);
 

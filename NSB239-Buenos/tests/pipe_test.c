@@ -2,7 +2,7 @@
 
 int main(void)
 {
-  int ret1, ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10;
+  int ret1, ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9;
 
   ret1 = syscall_create("[pipe]pipe1", 0);
   ret2 = syscall_create("[pipe]pipe2", 0);
@@ -13,7 +13,6 @@ int main(void)
   ret7 = syscall_create("[pipe]pipe7", 0);
   ret8 = syscall_create("[pipe]pipe8", 0);
   ret9 = syscall_create("[pipe]pipe9", 0);
-  ret10 = syscall_create("[pipe]pipe10", 0);
 
   printf("ret1: %d\n", ret1);
   printf("ret2: %d\n", ret2);
@@ -24,7 +23,6 @@ int main(void)
   printf("ret7: %d\n", ret7);
   printf("ret8: %d\n", ret8);
   printf("ret9: %d\n", ret9);
-  printf("ret10: %d\n", ret10);
 
   syscall_halt();
   return 0;

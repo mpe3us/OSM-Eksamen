@@ -28,6 +28,8 @@ typedef struct {
     pipe_state_t state;
     /* Pipe_id */
     pipe_id_t pipe_id;
+    /* Data of the pipe */
+    char data[PIPE_MAX_BUFFER];
 } pipe_table_t;
 
 /* Data structure for use internally in pipefs. We allocate space for this
@@ -56,13 +58,14 @@ fs_t *pipe_init(void)
     int i;
 
     pipe_table_t fs_pipes[MAX_PIPES];
-    //fs_pipes = fs_pipes;
+
     /* Initializing the pipe table */
     for(i = 0; i <= MAX_PIPES; i++)
     {
       fs_pipes[i].name[0] = 0;
       fs_pipes[i].state = PIPE_FREE;
       fs_pipes[i].pipe_id = i;
+      fs_pipes[i].data[0] = 0;
     }
 
     /* check semaphore availability before memory allocation */
@@ -138,10 +141,14 @@ int pipe_open(fs_t *fs, char *filename)
     return VFS_NOT_SUPPORTED;
 }
 
+/* Closes file. There is nothing to be done, no data strucutures or similar are
+   reserved for file. Returns VFS_OK. */
 int pipe_close(fs_t *fs, int fileid)
 {
-    fs = fs; fileid = fileid;
-    return VFS_NOT_SUPPORTED;
+    fs = fs;
+    fileid = fileid;
+
+    return VFS_OK;   
 }
 
 /* Creates a new pipe with the given filename/name */

@@ -111,18 +111,25 @@ fs_t *pipe_init(void)
     fs->filecount = pipe_filecount;
     fs->file      = pipe_file;
 
-    kprintf("PIPE IS INITIALIZED!\n");
-
     return fs;
 }
 
-/* You have to implement the following functions.  Some of them may
-   just return an error.  You have to carefully consider what to do.*/
-
+/* Unmounts the pipe filesystem. Waits for the current operation(s) to finish, 
+   frees reserved memory and returns OK.  */
 int pipe_unmount(fs_t *fs)
 {
-    fs=fs;
-    return VFS_NOT_SUPPORTED;
+    pipefs_t *pipefs;
+
+    pipefs = (pipefs_t *)fs->internal;
+
+    semaphore_P(pipefs->lock); /* The semaphore should be free at this
+                               point, we get it just in case something has gone wrong. */
+
+    /* free semaphore and allocated memory */
+    semaphore_destroy(pipefs->lock);
+    pagepool_free_phys_page(ADDR_KERNEL_TO_PHYS((uint32_t)fs));
+
+    return VFS_OK;
 }
 
 int pipe_open(fs_t *fs, char *filename)
@@ -137,10 +144,36 @@ int pipe_close(fs_t *fs, int fileid)
     return VFS_NOT_SUPPORTED;
 }
 
+/* Creates a new pipe with the given filename/name */
 int pipe_create(fs_t *fs, char *filename, int size)
 {
-    fs=fs; filename=filename; size=size;
-    return VFS_NOT_SUPPORTED;
+    size = size; /* Unused */
+    pipefs_t *pipefs = (pipefs_t *)fs->internal;
+    pipe_id_t i, pipe_id = -1;
+
+    semaphore_P(pipefs->lock);
+    
+    /* Searchs the pipe table for the first free pipe */
+    for(i = 0; i <= MAX_PIPES; i++)
+    {
+      if (pipefs->pipes[i].state == PIPE_FREE)
+      {
+        stringcopy(pipefs->pipes[i].name, filename, PIPE_MAX_NAMELENGTH);
+        pipefs->pipes[i].state = PIPE_TAKEN;
+        pipe_id = i;
+        break;
+      }
+    }
+
+    /* Is the pipe table full? */
+    if (pipe_id < 0)
+    { 
+      semaphore_V(pipefs->lock);
+	  return VFS_ERROR;
+    }
+
+    semaphore_V(pipefs->lock);
+    return VFS_OK;
 }
 
 int pipe_remove(fs_t *fs, char *filename)

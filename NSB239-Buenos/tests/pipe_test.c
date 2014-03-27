@@ -3,6 +3,9 @@
 int main(void)
 {
   int ret1, ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9;
+  int open = open;
+  int written = written;
+  int read = read;
 
   ret1 = syscall_create("[pipe]pipe1", 0);
   ret2 = syscall_create("[pipe]pipe2", 0);
@@ -24,6 +27,29 @@ int main(void)
   printf("ret8: %d\n", ret8);
   printf("ret9: %d\n", ret9);
 
-  syscall_halt();
+  open = syscall_open("[pipe]pipe5");
+
+  printf("Handler: %d\n", open);
+
+  char buffer[50] = "Hello world";
+
+  printf("buffer: %s\n", buffer);
+
+  written = syscall_write(open, buffer, 12);
+
+  printf("written bytes: %d\n", written);
+
+/*
+  char buf[50] = "Hejsa";
+
+  printf("Before: %s\n", buf);
+
+  read = syscall_read(open, buf, 12);
+
+  printf("read bytes: %d\n", read);
+
+  printf("After: %s\n", buf); */
+
+  syscall_exit(0);
   return 0;
 }

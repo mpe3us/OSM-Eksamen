@@ -135,10 +135,28 @@ int pipe_unmount(fs_t *fs)
     return VFS_OK;
 }
 
+/* Opens the file. Returns the the pipe_id or VFS_NOT_FOUND, if
+   file not found  */
 int pipe_open(fs_t *fs, char *filename)
 {
-    fs=fs; filename=filename;
-    return VFS_NOT_SUPPORTED;
+    pipefs_t *pipefs = (pipefs_t *)fs->internal;
+    pipe_id_t i;
+
+    semaphore_P(pipefs->lock);
+
+    /* Searches through the pipe table for the pipe_id with the
+       given filename */
+    for(i = 0; i <= MAX_PIPES; i++)
+    {
+      if (stringcmp(pipefs->pipes[i].name, filename) == 0)
+      {
+        semaphore_V(pipefs->lock);
+        return pipefs->pipes[i].pipe_id;
+      }
+    }
+
+    semaphore_V(pipefs->lock);
+    return VFS_NOT_FOUND;
 }
 
 /* Closes file. There is nothing to be done, no data strucutures or similar are
@@ -189,16 +207,66 @@ int pipe_remove(fs_t *fs, char *filename)
     return VFS_NOT_SUPPORTED;
 }
 
+
+/* Reads the pipe-data with the given fileid into buffer into
+   Returns number of bytes read */
 int pipe_read(fs_t *fs, int fileid, void *buffer, int bufsize, int offset)
 {
-    fs=fs; fileid=fileid; buffer=buffer; bufsize=bufsize; offset=offset;
-    return VFS_NOT_SUPPORTED;
+    pipefs_t *pipefs = (pipefs_t *)fs->internal;
+    pipe_id_t i;
+
+    offset = offset;
+
+    /* If the bufsize exceeds the buffer, return error */
+    if (bufsize > PIPE_MAX_BUFFER)
+    {
+      return VFS_ERROR;
+    }
+
+    semaphore_P(pipefs->lock);
+
+    for(i = 0; i <= MAX_PIPES; i++)
+    {
+      if (pipefs->pipes[i].pipe_id == fileid)
+      {
+        stringcopy(buffer, pipefs->pipes[i].data, bufsize);
+      }
+    }
+
+    semaphore_V(pipefs->lock);
+
+    return bufsize;
 }
 
+/* Writes buffer into the pipe-data with the given fileid.
+   Returns number of bytes written */
 int pipe_write(fs_t *fs, int fileid, void *buffer, int datasize, int offset)
 {
-    fs=fs; fileid=fileid; buffer=buffer; datasize=datasize; offset=offset;
-    return VFS_NOT_SUPPORTED;
+    pipefs_t *pipefs = (pipefs_t *)fs->internal;
+
+    pipe_id_t i;
+
+    offset = offset;
+
+    /* If the datasize exceeds the buffer, return error */
+    if (datasize > PIPE_MAX_BUFFER)
+    {
+      return VFS_ERROR;
+    }
+
+    semaphore_P(pipefs->lock);
+
+    for(i = 0; i <= MAX_PIPES; i++)
+    {
+      if (pipefs->pipes[i].pipe_id == fileid)
+      {
+        stringcopy(pipefs->pipes[i].data, buffer, datasize);
+      }
+    }
+
+    semaphore_V(pipefs->lock);
+
+    return datasize;
 }
 
 int pipe_getfree(fs_t *fs)

@@ -121,7 +121,6 @@ static TID_t scheduler_remove_first_ready(void)
     TID_t i = scheduler_ready_to_run.head;
 
     int no_high_p = 1;
-    no_high_p = no_high_p;
     int j = i;
 
     /* Makes sure that earliest deadline starting point is not zero (low-priority).
@@ -136,14 +135,10 @@ static TID_t scheduler_remove_first_ready(void)
           j = i_next;
           t = j;
           no_high_p = 0;
-          //kprintf("deadline = 0?: %d\n", thread_table[t].deadline);
           /* If a deadline is higher than zero is found - break out of loop */
           break;
         }
         i = i_next; 
-        //kprintf("i value: %d\n", i);
-        //kprintf("tail value: %d\n", scheduler_ready_to_run.tail); 
-      
       }
     }
 
@@ -151,7 +146,6 @@ static TID_t scheduler_remove_first_ready(void)
        sets it as t */
     if (no_high_p == 0)
     {
-   // kprintf("p: %d\n", no_high_p);
       while (thread_table[j].next >= 0)
       {
         TID_t j_next = thread_table[j].next;
@@ -162,10 +156,7 @@ static TID_t scheduler_remove_first_ready(void)
         }
         j = j_next;   
       }
-      //kprintf("earliest d: %d\n", thread_table[t].deadline);
     }
-
-    //kprintf("tail value: %d\n", scheduler_ready_to_run.tail); 
   
     /* Idle thread should never be on the ready list. */
     KERNEL_ASSERT(t != IDLE_THREAD_TID);
